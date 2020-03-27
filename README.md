@@ -11,15 +11,9 @@
 > http://www.upv.es/edxcovid19/ but you need an upv related email to
 > request licences
 > 
-> 
-> 
-> Disclaimer2: since it has been done in 2-3 days lapse while i relearnt
-> node after long hiatus without using it. You prolly can find better
-> ways to do some stuff (feel free to teach me the ways).
 
-  
 
-# I don't care i want to use it for my organization!
+# I want to use it for my organization!
 
   
 
