@@ -6,6 +6,8 @@ var csvParser = require('csv-parse');
 const nodemailer = require("nodemailer");
 var lang = require('../config/lang_conf')
 var emailconf = require('../config/email')
+let processing = false;
+
 router.post('/request/',(req,res,next) =>{	
 	let pnum = db.numlicenses(req.body.email);	
 	pnum.then((num) => {
