@@ -153,9 +153,26 @@ router.get('/mailing',async function(req, res, next) {
 	res.send(result);
 });
 
-router.get('/assign', async (req, res, next) => {  		
-	let results = await db.assignlic();
-	res.send(results);
+router.get('/assign', async (req, res, next) => {  	
+	if (processing ==true)
+	{
+		res.send('processing previous assign');
+	}
+	else{	
+	processing = true;
+	try{
+		let pendientes = await db.getpendientes();		
+		for (i =0; i<pendientes.length;i++)
+		{
+			let licencialimpia = await db.getlicencialimpia();			
+			let assignada = await db.assignarlicencia(pendientes[i],licencialimpia[0]['idlicencias']);			
+		}			
+	}catch(e){
+		log_file.write('Error asignando licencias:' +e.message);	
+	}		
+	processing = false;
+    res.send('licencias asignadas');		
+	}	
 });
 
 
