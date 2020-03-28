@@ -100,63 +100,55 @@ licencesdb.createlic = (platform,license,url) =>{
     
 }
 
-licencesdb.assignlic = () =>{	
-	
-		return new  Promise((resolve,reject) => {
-	try{	
-	if (processing == true)
-	{			
-		resolve('A task already processing please wait');
-	}
-	else{	 
-	 processing = true;		
-	 pool.query('SELECT idlicencias,plataforma,licencia,url FROM `licencias` WHERE entregada is NULL', (err,licenses) => {		
-		if (err){
-			reject(err);
-		}
-		console.log('licencias = ' + licenses.length);	 
-		if (licenses.length>0){
-			console.log(licenses.length + 'cuantas?');
-			pool.query('SELECT id,email,licencia,fecha FROM `solicitudes` WHERE licencia is NULL order by fecha', (function(licenses){
-				return function (err,solicitudes,fields) {
-					console.log('aqui tengo solicitudes y licencias para procesar\n');
-					console.log('solicitudes' + solicitudes.length.toString() + '\n');
-					console.log('licencias' + licenses.length.toString() + '\n');
-					for (i=0;i<solicitudes.length;i++)
-					{
-						pool.query('UPDATE `solicitudes` SET licencia = ? WHERE id = ?',[licenses[i]['idlicencias'],solicitudes[i]['id']],(err,results)=>{
-							if (err){
-								console.log("error assigning the license " + licenses[i]['idlicencias'].toString() + "\n");							
-								reject(err);
-							}
-							});
-						pool.query('UPDATE `licencias` SET entregada = ? WHERE idlicencias = ?',[solicitudes[i]['id'],licenses[i]['idlicencias']],(err,results)=>{
-							if (err){
-								console.log("error assigning the license " + licenses[i]['idlicencias'].toString() + "\n");
-								reject(err);
-							}
-							});
-						
+licencesdb.getpendientes = () => {
+	return new Promise((resolve,reject) => {
+		try{
+				pool.query("SELECT id,email,licencia,fecha FROM solicitudes WHERE licencia is NULL order by fecha",[],(err,results)=>{
+					if (err){						
+						reject(err);
 					}
-					
-					};	
-			})(licenses));
-			resolve('Licences assigned to the pending requests');
-		}
-		else{			
-			resolve('0 Licenses remaining');
-		}
-       
-			
-        });	
-		
-	processing = false;
-	}
-	}
-	catch(e){
-		reject(e);
-	}
-    });
+					else{
+						resolve(results);	
+					}					
+				});				
+			}catch(e){
+			reject(e);
+			}
+	});
+}
+
+licencesdb.getlicencialimpia = () => {
+	return new Promise((resolve,reject) => {
+		try{
+				pool.query("select idlicencias from licencias where licencias.idlicencias not in (select licencia from solicitudes where licencia is not null) and anulada=0 ORDER by idlicencias LIMIT 1",[],(err,results)=>{
+					if (err){						
+						reject(err);
+					}
+					else{
+						resolve(results);	
+					}					
+				});				
+			}catch(e){
+			reject(e);
+			}
+	});
+}
+
+licencesdb.assignarlicencia = (pendiente,idlicencia) => {
+	return new Promise((resolve,reject) => {
+		try{
+				pool.query("UPDATE solicitudes SET licencia = ? WHERE id = ?",[idlicencia,pendiente['id']],(err,results)=>{
+					if (err){						
+						reject(err);
+					}
+					else{
+						resolve('updated');	
+					}					
+				});				
+			}catch(e){
+			reject(e);
+			}
+	});
 }
 
 
