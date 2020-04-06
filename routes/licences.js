@@ -95,8 +95,8 @@ function sendMail(receiver,licences){
 			}
 
 			let transporter = nodemailer.createTransport({
-				host: "smtp.upv.es",
-				port: 25,
+				host: "smtp.host.ip",
+				port: 1234,
 				secure: false, // true for 465, false for other ports					
 			});	
 			
